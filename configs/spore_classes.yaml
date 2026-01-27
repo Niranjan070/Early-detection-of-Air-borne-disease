@@ -1,0 +1,32 @@
+# Spore Classification Classes
+# Define all spore types to be detected
+
+# Number of classes
+nc: 6
+
+# Class names
+names:
+  0: alternaria
+  1: fusarium
+  2: botrytis
+  3: powdery_mildew
+  4: rust_spores
+  5: downy_mildew
+
+# Class descriptions
+descriptions:
+  alternaria: "Dark, multicellular spores with longitudinal and transverse septa"
+  fusarium: "Banana or canoe-shaped spores, usually multicellular"
+  botrytis: "Oval to elliptical, single-celled gray spores"
+  powdery_mildew: "Barrel-shaped, hyaline (colorless) spores"
+  rust_spores: "Round to oval, often yellow-orange colored spores"
+  downy_mildew: "Lemon-shaped spores with distinctive papilla"
+
+# Detection difficulty (for reference)
+difficulty:
+  alternaria: "medium"
+  fusarium: "medium"
+  botrytis: "easy"
+  powdery_mildew: "easy"
+  rust_spores: "easy"
+  downy_mildew: "medium"

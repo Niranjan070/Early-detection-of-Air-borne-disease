@@ -1,0 +1,79 @@
+# Spore Type to Plant Disease Mapping
+# This file maps detected spore types to potential plant diseases
+
+disease_mapping:
+  alternaria:
+    diseases:
+      - name: "Early Blight"
+        crops: ["tomato", "potato", "eggplant"]
+        severity: "high"
+      - name: "Alternaria Leaf Spot"
+        crops: ["cabbage", "cauliflower", "broccoli"]
+        severity: "medium"
+    threshold_low: 10
+    threshold_high: 50
+    
+  fusarium:
+    diseases:
+      - name: "Fusarium Wilt"
+        crops: ["tomato", "banana", "cotton"]
+        severity: "critical"
+      - name: "Root Rot"
+        crops: ["beans", "peas", "wheat"]
+        severity: "high"
+    threshold_low: 5
+    threshold_high: 30
+    
+  botrytis:
+    diseases:
+      - name: "Gray Mold"
+        crops: ["strawberry", "grape", "tomato"]
+        severity: "high"
+      - name: "Blossom Blight"
+        crops: ["apple", "pear", "cherry"]
+        severity: "medium"
+    threshold_low: 15
+    threshold_high: 60
+    
+  powdery_mildew:
+    diseases:
+      - name: "Powdery Mildew"
+        crops: ["cucumber", "squash", "grape", "wheat"]
+        severity: "medium"
+    threshold_low: 20
+    threshold_high: 80
+    
+  rust_spores:
+    diseases:
+      - name: "Rust Disease"
+        crops: ["wheat", "corn", "beans", "coffee"]
+        severity: "high"
+    threshold_low: 10
+    threshold_high: 40
+    
+  downy_mildew:
+    diseases:
+      - name: "Downy Mildew"
+        crops: ["grape", "cucumber", "lettuce", "onion"]
+        severity: "high"
+    threshold_low: 15
+    threshold_high: 50
+
+# Risk Level Definitions
+risk_levels:
+  low:
+    description: "Low risk - Monitor regularly"
+    action: "Continue routine monitoring"
+    color: "green"
+  medium:
+    description: "Medium risk - Preventive measures recommended"
+    action: "Apply preventive fungicides, increase monitoring frequency"
+    color: "yellow"
+  high:
+    description: "High risk - Immediate action required"
+    action: "Apply treatment immediately, isolate affected areas"
+    color: "red"
+  critical:
+    description: "Critical - Emergency response needed"
+    action: "Emergency intervention, consider removing infected plants"
+    color: "darkred"

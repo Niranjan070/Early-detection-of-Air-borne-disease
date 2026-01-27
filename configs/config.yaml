@@ -1,0 +1,59 @@
+# Main Configuration File
+# Plant Disease Prediction System
+
+# Project Settings
+project:
+  name: "Spore Disease Predictor"
+  version: "1.0.0"
+
+# Data Settings
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  annotations_dir: "data/annotations"
+  train_dir: "data/splits/train"
+  val_dir: "data/splits/val"
+  test_dir: "data/splits/test"
+  image_size: 640
+  batch_size: 16
+
+# Model Settings
+model:
+  architecture: "yolov8n"  # Options: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x
+  weights_dir: "models/weights"
+  pretrained: true
+  num_classes: 6  # Number of spore types
+
+# Training Settings
+training:
+  epochs: 100
+  learning_rate: 0.001
+  optimizer: "AdamW"
+  patience: 10  # Early stopping patience
+  save_best: true
+  device: "auto"  # auto, cpu, cuda
+
+# Detection Settings
+detection:
+  confidence_threshold: 0.5
+  iou_threshold: 0.45
+  max_detections: 300
+
+# Disease Prediction Settings
+prediction:
+  risk_thresholds:
+    low: 10
+    medium: 50
+    high: 100
+
+# API Settings
+api:
+  host: "0.0.0.0"
+  port: 8000
+  debug: true
+
+# Logging
+logging:
+  level: "INFO"
+  save_logs: true
+  log_dir: "outputs/logs"
