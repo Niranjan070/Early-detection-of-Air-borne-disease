@@ -1,0 +1,14 @@
+path: C:/Users/nirth/Documents/PROJECTS/MINI_PROJECT/data/splits
+train: train/images
+val: val/images
+test: test/images
+
+nc: 1
+names: ['spore']
+
+roboflow:
+  workspace: iowa-state-university-cwvqa
+  project: spore-m-oryzae-xzewf
+  version: 6
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/iowa-state-university-cwvqa/spore-m-oryzae-xzewf/dataset/6
