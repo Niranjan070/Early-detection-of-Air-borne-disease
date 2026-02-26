@@ -22,7 +22,7 @@ model:
   architecture: "yolov8n"  # Options: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x
   weights_dir: "models/weights"
   pretrained: true
-  num_classes: 6  # Number of spore types
+  num_classes: 1  # Number of spore types
 
 # Training Settings
 training:

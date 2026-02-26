@@ -28,21 +28,12 @@ class DiseasePredictor:
         # Default mapping
         return {
             'disease_mapping': {
-                'alternaria': {
+                'magnaporthe_oryzae': {
                     'diseases': [
-                        {'name': 'Early Blight', 'crops': ['tomato', 'potato'], 'severity': 'high'},
-                        {'name': 'Leaf Spot', 'crops': ['cabbage', 'cauliflower'], 'severity': 'medium'}
-                    ],
-                    'threshold_low': 10,
-                    'threshold_high': 50
-                },
-                'fusarium': {
-                    'diseases': [
-                        {'name': 'Fusarium Wilt', 'crops': ['tomato', 'banana'], 'severity': 'critical'},
-                        {'name': 'Root Rot', 'crops': ['beans', 'peas'], 'severity': 'high'}
+                        {'name': 'Rice Blast', 'crops': ['rice'], 'severity': 'critical'}
                     ],
                     'threshold_low': 5,
-                    'threshold_high': 30
+                    'threshold_high': 20
                 },
                 'botrytis': {
                     'diseases': [

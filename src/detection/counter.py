@@ -19,8 +19,7 @@ class SporeCounter:
             class_names: List of spore class names
         """
         self.class_names = class_names or [
-            'alternaria', 'fusarium', 'botrytis',
-            'powdery_mildew', 'rust_spores', 'downy_mildew'
+            'magnaporthe_oryzae'
         ]
     
     def count_spores(self, detections: List[Dict]) -> Dict[str, int]:
