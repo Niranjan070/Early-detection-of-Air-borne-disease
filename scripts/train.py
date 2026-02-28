@@ -17,7 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description='Train spore detection model')
     parser.add_argument('--config', type=str, default='configs/config.yaml',
                         help='Path to config file')
-    parser.add_argument('--data', type=str, default='data.yaml',
+    parser.add_argument('--data', type=str, default='configs/data.yaml',
                         help='Path to data.yaml')
     parser.add_argument('--epochs', type=int, default=None,
                         help='Number of epochs (overrides config)')
@@ -60,7 +60,8 @@ def main():
         img_size=img_size,
         batch_size=batch_size,
         project='runs/train',
-        name='spore_detector'
+        name='spore_detector',
+        resume=args.resume is not None
     )
     
     logger.info("Training complete!")

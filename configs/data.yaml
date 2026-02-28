@@ -4,7 +4,7 @@ val: val/images
 test: test/images
 
 nc: 1
-names: ['spore']
+names: ['magnaporthe_oryzae']
 
 roboflow:
   workspace: iowa-state-university-cwvqa

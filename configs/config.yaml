@@ -31,7 +31,7 @@ training:
   optimizer: "AdamW"
   patience: 10  # Early stopping patience
   save_best: true
-  device: "auto"  # auto, cpu, cuda
+  device: "0"  # 0 = first GPU, cpu = CPU only
 
 # Detection Settings
 detection:

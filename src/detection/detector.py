@@ -31,7 +31,15 @@ class SporeDetector:
     ):
         self.conf_threshold = conf_threshold
         self.iou_threshold = iou_threshold
-        self.device = device
+        # Convert numeric string to int for CUDA device selection
+        if device == 'auto':
+            import torch
+            self.device = 0 if torch.cuda.is_available() else 'cpu'
+        else:
+            try:
+                self.device = int(device)
+            except (ValueError, TypeError):
+                self.device = device
         
         # Load model
         if model_path and os.path.exists(model_path):
@@ -40,6 +48,17 @@ class SporeDetector:
             # Load pretrained YOLOv8 nano as base
             self.model = YOLO('yolov8n.pt')
             print("Warning: Using pretrained YOLOv8n. Train on spore data for better results.")
+        
+        # Remap generic class names to actual spore names
+        CLASS_NAME_REMAP = {
+            'spore': 'magnaporthe_oryzae',
+        }
+        for idx, name in dict(self.model.names).items():
+            if name in CLASS_NAME_REMAP:
+                self.model.names[idx] = CLASS_NAME_REMAP[name]
+                # Also update the underlying model's names
+                if hasattr(self.model, 'model') and hasattr(self.model.model, 'names'):
+                    self.model.model.names[idx] = CLASS_NAME_REMAP[name]
     
     def detect(
         self,
@@ -138,7 +157,8 @@ class SporeDetector:
         img_size: int = 640,
         batch_size: int = 16,
         project: str = 'runs/train',
-        name: str = 'spore_detector'
+        name: str = 'spore_detector',
+        resume: bool = False
     ) -> None:
         """
         Train the YOLO model on spore dataset.
@@ -150,6 +170,7 @@ class SporeDetector:
             batch_size: Training batch size
             project: Project directory for saving results
             name: Experiment name
+            resume: Whether to resume training from checkpoint
         """
         self.model.train(
             data=data_yaml,
@@ -158,7 +179,8 @@ class SporeDetector:
             batch=batch_size,
             project=project,
             name=name,
-            device=self.device
+            device=self.device,
+            resume=resume
         )
         
         print(f"Training complete. Results saved to {project}/{name}")

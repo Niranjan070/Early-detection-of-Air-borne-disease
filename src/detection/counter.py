@@ -11,6 +11,11 @@ class SporeCounter:
     Count spores by type from detection results.
     """
     
+    # Map generic/legacy class names to actual spore names
+    CLASS_NAME_REMAP = {
+        'spore': 'magnaporthe_oryzae',
+    }
+    
     def __init__(self, class_names: List[str] = None):
         """
         Initialize spore counter.
@@ -32,8 +37,11 @@ class SporeCounter:
         Returns:
             Dictionary with spore type counts
         """
-        # Extract class names from detections
-        class_names = [d['class_name'] for d in detections]
+        # Extract class names from detections, remapping generic names
+        class_names = [
+            self.CLASS_NAME_REMAP.get(d['class_name'], d['class_name'])
+            for d in detections
+        ]
         
         # Count occurrences
         counts = Counter(class_names)
