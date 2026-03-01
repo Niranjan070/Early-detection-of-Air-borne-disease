@@ -69,7 +69,8 @@ class DiseasePredictor:
     def predict(
         self,
         spore_counts: Dict[str, int],
-        crop_type: Optional[str] = None
+        crop_type: Optional[str] = None,
+        exposure_hours: Optional[float] = None,
     ) -> Dict:
         """
         Predict diseases based on spore counts.
@@ -82,6 +83,9 @@ class DiseasePredictor:
             Dictionary with predictions and risk levels
         """
         predictions = []
+
+        use_rate = exposure_hours is not None and float(exposure_hours) > 0
+        exposure = float(exposure_hours) if use_rate else None
         
         for spore_type, count in spore_counts.items():
             if spore_type == 'total' or count == 0:
@@ -91,13 +95,24 @@ class DiseasePredictor:
             if not mapping:
                 continue
             
-            # Determine risk level
+            # Determine risk level (prefer per-hour thresholds when exposure is provided)
             threshold_low = mapping.get('threshold_low', 10)
             threshold_high = mapping.get('threshold_high', 50)
-            
-            if count < threshold_low:
+
+            metric = 'count'
+            metric_value = count
+
+            if use_rate and (
+                'threshold_low_per_hour' in mapping or 'threshold_high_per_hour' in mapping
+            ):
+                metric = 'per_hour'
+                metric_value = count / exposure
+                threshold_low = mapping.get('threshold_low_per_hour', threshold_low)
+                threshold_high = mapping.get('threshold_high_per_hour', threshold_high)
+
+            if metric_value < threshold_low:
                 risk_level = 'low'
-            elif count < threshold_high:
+            elif metric_value < threshold_high:
                 risk_level = 'medium'
             else:
                 risk_level = 'high'
@@ -112,6 +127,8 @@ class DiseasePredictor:
                     'disease': disease['name'],
                     'spore_type': spore_type,
                     'spore_count': count,
+                    'metric': metric,
+                    'metric_value': round(float(metric_value), 4),
                     'risk_level': risk_level,
                     'severity': disease.get('severity', 'unknown'),
                     'affected_crops': disease.get('crops', [])

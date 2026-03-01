@@ -84,6 +84,15 @@ outputs/
 runs/
 *.log
 
+# Database & uploads
+outputs/db/*.sqlite3
+outputs/uploads/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
 # OS files
 .DS_Store
 Thumbs.db

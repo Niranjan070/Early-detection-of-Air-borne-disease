@@ -154,6 +154,42 @@ python scripts/predict_disease.py --image path/to/spore_image.jpg --model runs/d
 uvicorn api.app:app --reload --host 0.0.0.0 --port 8000
 ```
 
+## 🖥️ Frontend (React + Vite)
+
+### Daily Check-In Workflow
+
+The React frontend provides a **farmer-friendly dashboard** for daily spore monitoring:
+
+1. **Login with Farmer ID** — any identifier (name/number)
+2. **Upload microscope image** — one upload per day (re-uploads update that day's record)
+3. **Set crop type & exposure hours** — defaults to 24h (1 day trap exposure)
+4. **View results:**
+   - Spore count (total detected)
+   - Frequency (spores/hour) — computed from count ÷ exposure_hours
+   - Risk level (LOW/MEDIUM/HIGH) — based on frequency thresholds
+   - Action recommendation — what to do next
+
+### Run Frontend + Backend
+
+```bash
+# Terminal 1 (backend — uses your trained best.pt model)
+venv\Scripts\python -m uvicorn api.app:app --reload --host 127.0.0.1 --port 8000
+
+# Terminal 2 (frontend)
+cd frontend
+npm install  # only first time
+npm run dev
+```
+
+Then open `http://localhost:5173/` and start uploading daily samples.
+
+### Data Storage
+
+Each farmer's daily record is saved to SQLite at `outputs/db/samples.sqlite3`:
+- **One record per farmer per day** (re-uploads overwrite)
+- Stores: image path, spore counts, frequency, risk level, predictions
+- API endpoints: `POST /samples`, `GET /samples/today`, `GET /samples/history`
+
 ## 📊 Spore Detection Classes
 
 | Class ID | Spore Type | Description | Associated Disease | Status |
@@ -168,12 +204,22 @@ uvicorn api.app:app --reload --host 0.0.0.0 --port 8000
 
 ## 🔮 Disease Prediction Logic
 
-The system uses spore count thresholds to determine risk levels:
+The system uses **frequency-based thresholds** (when exposure hours are provided) or falls back to count thresholds:
 
+### Rice Blast (*Magnaporthe oryzae*)
+
+**By Frequency (spores/hour):**
 ```
-LOW RISK:     spore_count < 5      → Monitor crops
-MEDIUM RISK:  5 ≤ spore_count < 20 → Consider preventive action
-HIGH RISK:    spore_count ≥ 20     → Immediate treatment recommended
+LOW RISK:     freq < 0.21 spores/hour   → Monitor crops
+MEDIUM RISK:  0.21 ≤ freq < 0.83        → Consider preventive action
+HIGH RISK:    freq ≥ 0.83               → Immediate treatment recommended
+```
+
+**By Count (fallback, no exposure time given):**
+```
+LOW RISK:     count < 5 spores          → Monitor crops
+MEDIUM RISK:  5 ≤ count < 20            → Consider preventive action
+HIGH RISK:    count ≥ 20                → Immediate treatment recommended
 ```
 
 **Affected Crops:** Rice, Wheat, Barley

@@ -1,0 +1,90 @@
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  line-height: 1.4;
+}
+
+body {
+  margin: 0;
+  background: #f6f7f9;
+  color: #111827;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.row > * {
+  flex: 1;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+input, select, button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid #111827;
+  background: #111827;
+  color: white;
+  font-weight: 600;
+}
+
+button.secondary {
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #111827;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.badge.low { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+.badge.medium { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.badge.high { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+.badge.critical { background: #7f1d1d; border-color: #7f1d1d; color: #fff; }
+
+.muted { color: #6b7280; }
+
+h1 { margin: 0 0 10px 0; font-size: 22px; }
+
+pre {
+  margin: 0;
+  background: #0b1020;
+  color: #e5e7eb;
+  padding: 12px;
+  border-radius: 10px;
+  overflow: auto;
+  font-size: 12px;
+}

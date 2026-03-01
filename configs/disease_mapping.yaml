@@ -9,3 +9,6 @@ disease_mapping:
         severity: "critical"
     threshold_low: 5
     threshold_high: 20
+    # Optional frequency thresholds (spores per hour). Used when exposure_hours is provided.
+    threshold_low_per_hour: 0.21
+    threshold_high_per_hour: 0.83
