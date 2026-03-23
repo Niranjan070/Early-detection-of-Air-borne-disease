@@ -1,0 +1,42 @@
+paths:
+  image_dir: ../data/raw/images
+  metadata_csv: ../data/raw/sample_metadata.csv
+  labels_csv: ../data/raw/risk_labels.csv
+  detections_csv: ../data/interim/detections.csv
+  counts_csv: ../data/interim/image_counts.csv
+  feature_table_csv: ../data/processed/feature_table.csv
+  model_output: ../models/risk_model.pkl
+  metrics_output: ../models/risk_metrics.json
+  predictions_output: ../outputs/risk_predictions.csv
+
+yolo:
+  weights: ../../runs/detect/runs/train/spore_detector2/weights/best.pt
+  confidence: 0.25
+  iou: 0.45
+  max_det: 2000
+  device: cpu
+
+features:
+  timestamp_column: captured_at
+  preferred_group_columns:
+    - trap_id
+    - site_id
+    - field_id
+  rolling_window: 3
+  area_column_candidates:
+    - trap_area_mm2
+    - sampled_area_mm2
+
+risk_model:
+  target_column: blast_risk_label
+  join_key_priority:
+    - sample_id
+    - image_name
+  drop_columns:
+    - sample_id
+    - image_name
+    - image_path
+    - captured_at
+  test_size: 0.2
+  random_state: 42
+  n_estimators: 300

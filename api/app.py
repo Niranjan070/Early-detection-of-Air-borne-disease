@@ -2,16 +2,19 @@
 FastAPI application for spore detection and disease prediction.
 """
 
+import json
 import os
 import sys
 from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Form
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import numpy as np
 import cv2
+import pandas as pd
 from datetime import datetime
 
 sys.path.append(str(Path(__file__).parent.parent))
@@ -50,6 +53,21 @@ risk_analyzer = RiskAnalyzer()
 
 store = SampleStore(db_path='outputs/db/samples.sqlite3')
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+V2_ROOT = PROJECT_ROOT / 'v2_spore_risk'
+V2_FRONTEND_ROOT = V2_ROOT / 'frontend'
+V2_PATHS = {
+    'counts': V2_ROOT / 'data' / 'interim' / 'image_counts.csv',
+    'detections': V2_ROOT / 'data' / 'interim' / 'detections.csv',
+    'features': V2_ROOT / 'data' / 'processed' / 'feature_table.csv',
+    'labels': V2_ROOT / 'data' / 'raw' / 'risk_labels.csv',
+    'metrics': V2_ROOT / 'models' / 'risk_metrics.json',
+    'predictions': V2_ROOT / 'outputs' / 'risk_predictions.csv',
+}
+
+if V2_FRONTEND_ROOT.exists():
+    app.mount('/v2-static', StaticFiles(directory=str(V2_FRONTEND_ROOT)), name='v2-static')
+
 
 def _compute_frequency_per_hour(counts: dict, exposure_hours: float) -> dict:
     exposure = float(exposure_hours) if exposure_hours and float(exposure_hours) > 0 else 24.0
@@ -66,6 +84,79 @@ def _today_iso() -> str:
     return datetime.now().strftime('%Y-%m-%d')
 
 
+def _load_optional_csv(path: Path) -> pd.DataFrame:
+    if path.exists():
+        return pd.read_csv(path)
+    return pd.DataFrame()
+
+
+def _load_optional_json(path: Path) -> dict:
+    if path.exists():
+        with path.open('r', encoding='utf-8') as file_obj:
+            return json.load(file_obj)
+    return {}
+
+
+def _records_from_frame(frame: pd.DataFrame) -> list[dict]:
+    if frame.empty:
+        return []
+    normalized = frame.copy()
+    normalized = normalized.where(pd.notna(normalized), None)
+    return normalized.to_dict(orient='records')
+
+
+def _summarize_v2_outputs() -> dict:
+    counts_df = _load_optional_csv(V2_PATHS['counts'])
+    predictions_df = _load_optional_csv(V2_PATHS['predictions'])
+    labels_df = _load_optional_csv(V2_PATHS['labels'])
+    metrics = _load_optional_json(V2_PATHS['metrics'])
+
+    merged = counts_df.copy()
+    if not predictions_df.empty and 'sample_id' in predictions_df.columns:
+        merged = merged.merge(predictions_df, on=['sample_id', 'image_name', 'captured_at'], how='left')
+    if not labels_df.empty and 'sample_id' in labels_df.columns:
+        label_subset = labels_df[['sample_id', 'blast_risk_label']].drop_duplicates()
+        merged = merged.merge(label_subset, on='sample_id', how='left')
+
+    if not merged.empty and 'predicted_risk' in merged.columns:
+        risk_order = {'high': 0, 'medium': 1, 'low': 2}
+        merged['risk_rank'] = merged['predicted_risk'].map(risk_order).fillna(9)
+        merged = merged.sort_values(['risk_rank', 'total_count'], ascending=[True, False]).drop(columns=['risk_rank'])
+
+    risk_breakdown = {}
+    if not predictions_df.empty and 'predicted_risk' in predictions_df.columns:
+        risk_breakdown = {
+            str(key): int(value)
+            for key, value in predictions_df['predicted_risk'].value_counts().to_dict().items()
+        }
+
+    label_breakdown = {}
+    if not labels_df.empty and 'blast_risk_label' in labels_df.columns:
+        label_breakdown = {
+            str(key): int(value)
+            for key, value in labels_df['blast_risk_label'].dropna().value_counts().to_dict().items()
+        }
+
+    summary = {
+        'total_samples': int(len(merged.index)),
+        'avg_total_count': round(float(merged['total_count'].mean()), 2) if 'total_count' in merged.columns and not merged.empty else None,
+        'max_total_count': int(merged['total_count'].max()) if 'total_count' in merged.columns and not merged.empty else None,
+        'min_total_count': int(merged['total_count'].min()) if 'total_count' in merged.columns and not merged.empty else None,
+        'avg_confidence': round(float(merged['mean_confidence'].mean()), 4) if 'mean_confidence' in merged.columns and not merged.empty else None,
+        'accuracy': metrics.get('accuracy'),
+        'risk_breakdown': risk_breakdown,
+        'label_breakdown': label_breakdown,
+        'model_ready': V2_PATHS['predictions'].exists() and V2_PATHS['metrics'].exists(),
+    }
+
+    return {
+        'summary': summary,
+        'metrics': metrics,
+        'samples': _records_from_frame(merged),
+        'files': {name: path.exists() for name, path in V2_PATHS.items()},
+    }
+
+
 @app.get("/")
 async def root():
     """Health check endpoint."""
@@ -76,6 +167,19 @@ async def root():
 async def health():
     """Health check endpoint."""
     return {"status": "ok"}
+
+
+@app.get('/v2', include_in_schema=False)
+async def v2_frontend():
+    index_path = V2_FRONTEND_ROOT / 'index.html'
+    if not index_path.exists():
+        raise HTTPException(status_code=404, detail='v2 frontend not found')
+    return FileResponse(index_path)
+
+
+@app.get('/api/v2/dashboard')
+async def get_v2_dashboard():
+    return _summarize_v2_outputs()
 
 
 @app.post("/detect")
