@@ -1,15 +1,17 @@
-# 🌿 Airborne Spore Detection & Plant Disease Prediction System
+# 🌾 Crop Disease Alert — Airborne Spore Detection & Plant Disease Prediction
 
-An AI-powered system that predicts potential plant diseases by detecting and counting airborne fungal spores in spore trap images using YOLOv8 object detection. The system is designed to support multiple spore types — currently trained for *Magnaporthe oryzae* (Rice Blast), with more spore classes to be added.
+An AI-powered system that predicts potential plant diseases by detecting and counting airborne fungal spores in spore trap images using YOLOv8 object detection. Designed for **farmers** — upload a spore trap photo, get an instant risk assessment, and know exactly what action to take.
 
-## 📋 Project Overview
+---
 
-Airborne fungal spores are early indicators of plant disease outbreaks. By capturing and analyzing spore trap images, this system enables early detection and risk assessment:
+## 📋 What It Does
 
-- **Detect** airborne fungal spores in spore trap images using YOLOv8
-- **Count** spore quantities to assess density
-- **Predict** potential plant diseases based on spore-to-disease mapping
-- **Alert** farmers before disease outbreaks occur
+Airborne fungal spores are early indicators of plant disease outbreaks. This system captures and analyzes spore trap images to help farmers act before it's too late:
+
+1. **Detect** — Finds airborne fungal spores in microscope images using YOLOv8
+2. **Count** — Measures spore density and calculates spores-per-hour frequency
+3. **Predict** — Maps detected spores to potential crop diseases
+4. **Alert** — Shows a clear risk level (Safe / Moderate / High / Critical) with actionable advice
 
 ### Currently Supported Spores
 
@@ -21,9 +23,11 @@ Airborne fungal spores are early indicators of plant disease outbreaks. By captu
 | *Botrytis* | Gray Mold | 🔜 Planned |
 | Rust Spores | Rust Disease | 🔜 Planned |
 
+---
+
 ## 📊 Training Results (*Magnaporthe oryzae*)
 
-The model was trained for **100 epochs** on the [Spore M. Oryzae dataset](https://universe.roboflow.com/iowa-state-university-cwvqa/spore-m-oryzae-xzewf/dataset/6) from Iowa State University.
+Trained for **100 epochs** on the [Spore M. Oryzae dataset](https://universe.roboflow.com/iowa-state-university-cwvqa/spore-m-oryzae-xzewf/dataset/6) from Iowa State University.
 
 | Metric | Best (Epoch 91) | Final (Epoch 100) |
 |---|---|---|
@@ -32,69 +36,105 @@ The model was trained for **100 epochs** on the [Spore M. Oryzae dataset](https:
 | **Precision** | 0.835 | 0.806 |
 | **Recall** | 0.696 | 0.659 |
 
+---
+
+## 🖥️ Screenshots
+
+### Login Screen
+Simple farmer-friendly login — just enter your name or ID, no email required.
+
+### Dashboard — Upload Tab
+Large tap-friendly upload area with image preview, crop selector, and exposure time input.
+
+### Dashboard — Results Tab
+Color-coded risk banner, spore count stats, breakdown by type, and plain-language recommendations ("What You Should Do").
+
+### Dashboard — History Tab
+See your last 10 daily checks at a glance with date, crop, spore count, and risk level.
+
+---
+
 ## 🏗️ Project Structure
 
 ```
 MINI_PROJECT/
 ├── api/
-│   ├── __init__.py
-│   └── app.py                  # FastAPI application
+│   └── app.py                      # FastAPI backend (detect, predict, store)
+│
+├── frontend/                        # React + Vite farmer dashboard
+│   ├── src/
+│   │   ├── App.jsx                  # Main app component (login, tabs, results)
+│   │   ├── styles.css               # Farmer-friendly green/earth theme
+│   │   ├── main.jsx                 # Entry point
+│   │   └── api.js                   # API helper utilities
+│   ├── index.html
+│   ├── vite.config.js               # Dev proxy → FastAPI backend
+│   └── package.json
 │
 ├── configs/
-│   ├── config.yaml             # Main configuration file
-│   ├── data.yaml               # Dataset paths & class definitions
-│   ├── spore_classes.yaml      # Spore class definitions
-│   └── disease_mapping.yaml    # Spore-to-disease mapping rules
+│   ├── config.yaml                  # Main configuration
+│   ├── data.yaml                    # Dataset paths & class definitions
+│   ├── spore_classes.yaml           # Spore class definitions
+│   └── disease_mapping.yaml         # Spore → disease mapping rules
 │
 ├── data/
-│   ├── raw/                    # Original spore trap images
-│   ├── processed/              # Preprocessed images
-│   ├── annotations/            # YOLO format annotations
+│   ├── raw/                         # Original spore trap images
+│   ├── processed/                   # Preprocessed images
+│   ├── annotations/                 # YOLO format annotations
 │   └── splits/
-│       ├── train/              # Training dataset (images + labels)
-│       ├── val/                # Validation dataset
-│       └── test/               # Test dataset
-│
-├── models/
-│   ├── weights/                # Trained model weights (.pt)
-│   └── configs/                # Model configuration files
+│       ├── train/                   # Training set (images + labels)
+│       ├── val/                     # Validation set
+│       └── test/                    # Test set
 │
 ├── src/
-│   ├── data/
-│   │   ├── dataset.py          # Dataset loading utilities
-│   │   ├── preprocessing.py    # Image preprocessing
-│   │   └── augmentation.py     # Data augmentation
 │   ├── detection/
-│   │   ├── detector.py         # YOLOv8 spore detection module
-│   │   └── counter.py          # Spore counting logic
+│   │   ├── detector.py              # YOLOv8 spore detection
+│   │   └── counter.py               # Spore counting logic
 │   ├── prediction/
-│   │   ├── disease_predictor.py    # Disease prediction engine
-│   │   └── risk_analyzer.py        # Risk level analysis
+│   │   ├── disease_predictor.py     # Disease prediction engine
+│   │   └── risk_analyzer.py         # Risk level analysis
+│   ├── storage/
+│   │   └── sample_store.py          # SQLite sample storage
+│   ├── data/
+│   │   ├── dataset.py               # Dataset loading
+│   │   ├── preprocessing.py         # Image preprocessing
+│   │   └── augmentation.py          # Data augmentation
 │   └── utils/
-│       ├── visualization.py    # Result visualization
-│       └── logger.py           # Logging utilities
+│       ├── visualization.py         # Result visualization
+│       └── logger.py                # Logging utilities
 │
 ├── scripts/
-│   ├── train.py                # Model training script
-│   ├── detect.py               # Spore detection script
-│   └── predict_disease.py      # Disease prediction pipeline
+│   ├── train.py                     # Model training
+│   ├── detect.py                    # Spore detection CLI
+│   └── predict_disease.py           # Full prediction pipeline
 │
-├── notebooks/                  # Jupyter notebooks for analysis
+├── notebooks/                       # Jupyter notebooks for analysis
 ├── outputs/
-│   ├── predictions/            # Detection output images
-│   ├── reports/                # Disease prediction reports
-│   ├── visualizations/         # Generated plots
-│   └── logs/                   # Training & inference logs
+│   ├── db/samples.sqlite3           # SQLite database (per-farmer daily records)
+│   ├── uploads/                     # Uploaded images
+│   ├── predictions/                 # Detection output images
+│   ├── reports/                     # Disease prediction reports
+│   ├── visualizations/              # Generated plots
+│   └── logs/                        # Training & inference logs
 │
-├── runs/                       # YOLO training runs & checkpoints
-├── tests/                      # Unit tests
+├── models/weights/                  # Trained model weights (.pt)
+├── runs/                            # YOLO training runs & checkpoints
+├── tests/                           # Unit tests
 ├── requirements.txt
 ├── setup_rice_blast.py
-├── .gitignore
 └── README.md
 ```
 
+---
+
 ## 🔧 Installation
+
+### Prerequisites
+
+- Python 3.9+
+- Node.js 18+ (for the frontend)
+
+### Backend Setup
 
 ```bash
 # Clone the repository
@@ -103,134 +143,144 @@ cd MINI_PROJECT
 
 # Create virtual environment
 python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # Linux / Mac
 
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
 ```
 
-## 🎯 Usage
-
-### Training the Model
+### Frontend Setup
 
 ```bash
-# Train from scratch
-python scripts/train.py --config configs/config.yaml
-
-# Resume interrupted training from checkpoint
-python scripts/train.py --resume runs/detect/runs/train/spore_detector2/weights/last.pt
-```
-
-### Running Spore Detection
-
-```bash
-# Detect spores in an image (saves result to outputs/predictions/)
-python scripts/detect.py --image path/to/spore_image.jpg --model runs/detect/runs/train/spore_detector2/weights/best.pt
-
-# With display window
-python scripts/detect.py --image path/to/spore_image.jpg --model runs/detect/runs/train/spore_detector2/weights/best.pt --show
-
-# Adjust confidence threshold
-python scripts/detect.py --image path/to/spore_image.jpg --model runs/detect/runs/train/spore_detector2/weights/best.pt --conf 0.4
-```
-
-### Predicting Disease Risk
-
-```bash
-# Full pipeline: detect → count → predict disease → analyze risk
-python scripts/predict_disease.py --image path/to/spore_image.jpg --model runs/detect/runs/train/spore_detector2/weights/best.pt
-
-# Save visual report
-python scripts/predict_disease.py --image path/to/spore_image.jpg --model runs/detect/runs/train/spore_detector2/weights/best.pt --save-report
-
-# Filter by crop type
-python scripts/predict_disease.py --image path/to/spore_image.jpg --model runs/detect/runs/train/spore_detector2/weights/best.pt --crop rice
-```
-
-### Starting the API
-
-```bash
-uvicorn api.app:app --reload --host 0.0.0.0 --port 8000
-```
-
-## 🖥️ Frontend (React + Vite)
-
-### Daily Check-In Workflow
-
-The React frontend provides a **farmer-friendly dashboard** for daily spore monitoring:
-
-1. **Login with Farmer ID** — any identifier (name/number)
-2. **Upload microscope image** — one upload per day (re-uploads update that day's record)
-3. **Set crop type & exposure hours** — defaults to 24h (1 day trap exposure)
-4. **View results:**
-   - Spore count (total detected)
-   - Frequency (spores/hour) — computed from count ÷ exposure_hours
-   - Risk level (LOW/MEDIUM/HIGH) — based on frequency thresholds
-   - Action recommendation — what to do next
-
-### Run Frontend + Backend
-
-```bash
-# Terminal 1 (backend — uses your trained best.pt model)
-venv\Scripts\python -m uvicorn api.app:app --reload --host 127.0.0.1 --port 8000
-
-# Terminal 2 (frontend)
 cd frontend
-npm install  # only first time
+npm install
+```
+
+---
+
+## 🚀 Running the Application
+
+### Start Both Servers
+
+```bash
+# Terminal 1 — Backend API
+venv\Scripts\activate
+uvicorn api.app:app --reload --host 127.0.0.1 --port 8000
+
+# Terminal 2 — Frontend Dev Server
+cd frontend
 npm run dev
 ```
 
-Then open `http://localhost:5173/` and start uploading daily samples.
+Open **http://localhost:5173/** in your browser.
 
-### Data Storage
+### Daily Check-In Workflow (for Farmers)
 
-Each farmer's daily record is saved to SQLite at `outputs/db/samples.sqlite3`:
-- **One record per farmer per day** (re-uploads overwrite)
-- Stores: image path, spore counts, frequency, risk level, predictions
-- API endpoints: `POST /samples`, `GET /samples/today`, `GET /samples/history`
+1. **Login** — Enter your name or ID (e.g., "Ramesh" or "F-101")
+2. **Select crop** — Rice, Wheat, or Barley
+3. **Set trap exposure** — How many hours was the spore trap exposed (default: 24)
+4. **Upload image** — Take a photo of the spore trap slide under a microscope
+5. **View results** — See risk level, spore count, per-hour frequency, and recommendations
+6. **Check history** — Track your daily checks over time
 
-## 📊 Spore Detection Classes
+---
 
-| Class ID | Spore Type | Description | Associated Disease | Status |
-|----------|------------|-------------|-------------------|--------|
-| 0 | *Magnaporthe oryzae* | Pear-shaped (pyriform), usually 3-celled spores | Rice Blast | ✅ Trained |
-| 1 | *Alternaria* | Dark, club-shaped, multicellular spores | Early Blight, Leaf Spot | 🔜 Planned |
-| 2 | *Fusarium* | Canoe-shaped macroconidia | Fusarium Wilt, Root Rot | 🔜 Planned |
-| 3 | *Botrytis* | Oval/elliptical, grape-like clusters | Gray Mold | 🔜 Planned |
-| 4 | Rust Spores | Round/oval, orange-brown | Rust Disease | 🔜 Planned |
+## 🧪 CLI Usage
 
-> **Note:** Currently only class 0 (*M. oryzae*) is trained. Additional spore classes will be added as annotated datasets become available.
+### Train the Model
+
+```bash
+python scripts/train.py --config configs/config.yaml
+
+# Resume from checkpoint
+python scripts/train.py --resume runs/detect/runs/train/spore_detector2/weights/last.pt
+```
+
+### Detect Spores
+
+```bash
+python scripts/detect.py --image path/to/image.jpg \
+    --model runs/detect/runs/train/spore_detector2/weights/best.pt
+
+# With display window
+python scripts/detect.py --image path/to/image.jpg \
+    --model runs/detect/runs/train/spore_detector2/weights/best.pt --show
+
+# Custom confidence threshold
+python scripts/detect.py --image path/to/image.jpg \
+    --model runs/detect/runs/train/spore_detector2/weights/best.pt --conf 0.4
+```
+
+### Predict Disease
+
+```bash
+python scripts/predict_disease.py --image path/to/image.jpg \
+    --model runs/detect/runs/train/spore_detector2/weights/best.pt
+
+# Filter by crop
+python scripts/predict_disease.py --image path/to/image.jpg \
+    --model runs/detect/runs/train/spore_detector2/weights/best.pt --crop rice
+
+# Save visual report
+python scripts/predict_disease.py --image path/to/image.jpg \
+    --model runs/detect/runs/train/spore_detector2/weights/best.pt --save-report
+```
+
+---
+
+## 🌐 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/` | Health check |
+| `GET`  | `/health` | Health check |
+| `POST` | `/detect` | Detect spores in an uploaded image |
+| `POST` | `/predict` | Detect + predict disease from an image |
+| `POST` | `/samples` | Create/update a farmer's daily sample |
+| `GET`  | `/samples/today` | Get today's result for a farmer |
+| `GET`  | `/samples/history` | Get a farmer's recent check history |
+| `GET`  | `/classes` | List detectable spore classes |
+
+---
 
 ## 🔮 Disease Prediction Logic
-
-The system uses **frequency-based thresholds** (when exposure hours are provided) or falls back to count thresholds:
 
 ### Rice Blast (*Magnaporthe oryzae*)
 
 **By Frequency (spores/hour):**
-```
-LOW RISK:     freq < 0.21 spores/hour   → Monitor crops
-MEDIUM RISK:  0.21 ≤ freq < 0.83        → Consider preventive action
-HIGH RISK:    freq ≥ 0.83               → Immediate treatment recommended
-```
 
-**By Count (fallback, no exposure time given):**
-```
-LOW RISK:     count < 5 spores          → Monitor crops
-MEDIUM RISK:  5 ≤ count < 20            → Consider preventive action
-HIGH RISK:    count ≥ 20                → Immediate treatment recommended
-```
+| Risk Level | Threshold | Action |
+|---|---|---|
+| ✅ Low | < 0.21 spores/hr | Monitor crops normally |
+| ⚠️ Medium | 0.21 – 0.83 spores/hr | Consider preventive fungicide |
+| 🔴 High | ≥ 0.83 spores/hr | Immediate treatment recommended |
+
+**By Count (fallback when no exposure time):**
+
+| Risk Level | Threshold | Action |
+|---|---|---|
+| ✅ Low | < 5 spores | Monitor crops normally |
+| ⚠️ Medium | 5 – 20 spores | Consider preventive action |
+| 🔴 High | ≥ 20 spores | Immediate treatment recommended |
 
 **Affected Crops:** Rice, Wheat, Barley
 
+---
+
 ## 🛠️ Tech Stack
 
-- **Detection Model:** YOLOv8n (Ultralytics)
-- **Framework:** PyTorch
-- **API:** FastAPI + Uvicorn
-- **Image Processing:** OpenCV, Pillow
-- **Dataset Source:** [Roboflow - Iowa State University](https://universe.roboflow.com/iowa-state-university-cwvqa/spore-m-oryzae-xzewf/dataset/6) (CC BY 4.0)
+| Layer | Technology |
+|-------|------------|
+| **Detection Model** | YOLOv8n (Ultralytics) |
+| **ML Framework** | PyTorch |
+| **Backend API** | FastAPI + Uvicorn |
+| **Frontend** | React 19 + Vite 7 |
+| **Database** | SQLite |
+| **Image Processing** | OpenCV, Pillow |
+| **Dataset** | [Roboflow — Iowa State University](https://universe.roboflow.com/iowa-state-university-cwvqa/spore-m-oryzae-xzewf/dataset/6) (CC BY 4.0) |
+
+---
 
 ## 📈 Future Enhancements
 
@@ -240,6 +290,9 @@ HIGH RISK:    count ≥ 20                → Immediate treatment recommended
 - [ ] Time-series analysis for outbreak prediction
 - [ ] Mobile app for in-field use
 - [ ] Real-time monitoring dashboard with IoT sensor integration
+- [ ] Multi-language support (Hindi, Tamil, Telugu, etc.)
+
+---
 
 ## 📝 License
 
@@ -250,4 +303,5 @@ MIT License
 - NIRANJAN
 
 ---
-*Early detection saves crops! 🌱*
+
+*🌾 Early detection saves crops!*
