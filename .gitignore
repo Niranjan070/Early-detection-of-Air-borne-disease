@@ -7,56 +7,17 @@ __pycache__/
 # ─── Distribution / packaging ───
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
 eggs/
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
 *.egg
-
-# ─── PyInstaller ───
-*.manifest
-*.spec
-
-# ─── Installer logs ───
-pip-log.txt
-pip-delete-this-directory.txt
-
-# ─── Tests / coverage ───
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# ─── Translations ───
-*.mo
-*.pot
-
-# ─── Jupyter ───
-.ipynb_checkpoints/
 
 # ─── Virtual environments ───
 .env
 .venv/
-env/
 venv/
 ENV/
-env.bak/
-venv.bak/
 
 # ─── IDE / Editor ───
 .idea/
@@ -65,7 +26,7 @@ venv.bak/
 *.swo
 *~
 
-# ─── Data (large image/label files) ───
+# ─── Data (large image/label files — too big for GitHub) ───
 data/raw/*
 data/processed/*
 data/splits/train/images/*
@@ -85,25 +46,16 @@ data/annotations/*
 !data/splits/test/labels/.gitkeep
 !data/annotations/.gitkeep
 
-# ─── Model weights ───
-models/weights/*.pt
-models/weights/*.onnx
-!models/weights/.gitkeep
+# ─── Model weights (too large for GitHub) ───
 *.pt
+*.onnx
 
-# ─── Outputs ───
-outputs/
+# ─── Training runs & outputs ───
 runs/
+outputs/
+
+# ─── Logs ───
 *.log
-
-# ─── Database & uploads ───
-outputs/db/*.sqlite3
-outputs/uploads/
-
-# ─── Frontend ───
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
 
 # ─── OS files ───
 .DS_Store
@@ -113,19 +65,3 @@ Thumbs.db
 *.tmp
 *.temp
 *.cache
-
-# v2 pipeline artifacts
-v2_spore_risk/data/raw/images/
-v2_spore_risk/data/interim/*.csv
-v2_spore_risk/data/processed/*.csv
-v2_spore_risk/data/raw/risk_labels.csv
-v2_spore_risk/data/raw/sample_metadata.csv
-v2_spore_risk/models/*.pkl
-v2_spore_risk/models/*.json
-v2_spore_risk/outputs/*.csv
-v2_spore_risk/frontend/node_modules/
-v2_spore_risk/frontend/dist/
-
-!v2_spore_risk/data/raw/.gitkeep
-!v2_spore_risk/data/interim/.gitkeep
-!v2_spore_risk/data/processed/.gitkeep
