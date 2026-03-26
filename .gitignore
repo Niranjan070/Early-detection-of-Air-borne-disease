@@ -36,6 +36,13 @@ data/splits/val/labels/*
 data/splits/test/images/*
 data/splits/test/labels/*
 data/annotations/*
+data/new_dataset/*
+data/merged/train/images/*
+data/merged/train/labels/*
+data/merged/val/images/*
+data/merged/val/labels/*
+data/merged/test/images/*
+data/merged/test/labels/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/splits/train/images/.gitkeep

@@ -1,0 +1,15 @@
+path: C:/Users/nirth/Documents/PROJECTS/MINI_PROJECT/data/merged
+train: train/images
+val: val/images
+test: test/images
+nc: 9
+names:
+- magnaporthe_oryzae
+- alternaria
+- bipolaris
+- curvularia
+- curvularia_eragrostidis
+- exserohilum
+- fusarium
+- fusarium_microconidie
+- mycelium
