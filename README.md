@@ -111,3 +111,13 @@ To increment epochs or adjust augmentation logic on the merged dataset:
 ```powershell
 python scripts/train.py --data configs/data_merged.yaml --epochs 50
 ```
+
+---
+
+## 👨‍💻 Author
+
+**NIRANJAN**
+
+- **GitHub:** [@Niranjan070](https://github.com/Niranjan070)
+- **LinkedIn:** [Niranjan T](https://www.linkedin.com/in/niranjan-t-/)
+- **Email:** niranjan2005official@gmail.com
