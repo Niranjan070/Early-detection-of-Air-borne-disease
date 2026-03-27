@@ -114,9 +114,11 @@ python scripts/train.py --data configs/data_merged.yaml --epochs 50
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Author & Contact
 
 **NIRANJAN**
+
+For any inquiries, discussions, or collaboration opportunities regarding this SporeNet Disease Detector project, please feel free to reach out to me!
 
 - **GitHub:** [@Niranjan070](https://github.com/Niranjan070)
 - **LinkedIn:** [Niranjan T](https://www.linkedin.com/in/niranjan-t-/)
