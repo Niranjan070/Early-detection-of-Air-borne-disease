@@ -1,94 +1,113 @@
-# 🔬 Rice Blast Spore Detection — YOLOv8 Model Training
+# 🔬 SporeNet AI — Advanced Plant Disease Risk Detection
 
-A YOLOv8-based object detection model to identify **Magnaporthe oryzae** spores (the fungus that causes Rice Blast disease) from microscopic spore trap images.
+An advanced deep learning framework powered by YOLOv8 for detecting and classifying microscopic plant pathogen spores. Originally built for **Magnaporthe oryzae** (Rice Blast), the model has been upgraded to a robust multi-class architecture to isolate pathogens from benign background spores effectively.
 
 ---
 
-## 📁 Project Structure
+## 🧠 Model Architecture & Training
+
+Our core detection model is a fine-tuned **YOLOv8 Nano (`yolov8n.pt`)**, optimized for microscopic object detection at high inference speeds.
+
+### 📊 Dataset Details
+To strictly reduce False Positives and enhance the model's vocabulary, the dataset was constructed by **merging** our proprietary Rice Blast dataset with a broader Curvularia genus dataset. This acts as a robust mechanism for "negative example" isolation.
+
+- **Total Classes**: 9 distinct spore variants.
+- **Dataset Size**: ~2,000+ annotated microscopic images (Train/Val/Test splits).
+- **Target Resolution**: 640x640 pixels
+- **Bounding Boxes**: Polygon segmentations were converted dynamically to YOLO normalized bounding boxes for strict object localization.
+
+### 🏷️ Detectable Spore Classes
+1. **`magnaporthe_oryzae`** *(Primary Target: Rice Blast)* 
+2. `alternaria` *(Background/Negative)*
+3. `bipolaris` *(Background/Negative)*
+4. `curvularia` *(Background/Negative)*
+5. `curvularia_eragrostidis` *(Background/Negative)*
+6. `exserohilum` *(Background/Negative)*
+7. `fusarium` *(Background/Negative)*
+8. `fusarium_microconidie` *(Background/Negative)*
+9. `mycelium` *(Background/Negative)*
+
+### ⚙️ Training Parameters (Latest Run: `spore_detector`)
+- **Epochs**: 50
+- **Batch Size**: 16
+- **Optimizer**: Auto (AdamW/SGD depending on heuristics)
+- **Base Weights**: Pretrained `yolov8n.pt`
+- **Configuration**: `configs/data_merged.yaml`
+
+---
+
+## 📁 Repository Structure
 
 ```
 MINI_PROJECT/
 │
 ├── configs/                    # ⚙️ Configuration files
-│   ├── data.yaml               #    → Tells YOLO where your images & labels are
-│   ├── config.yaml              #    → Training hyperparameters (epochs, batch size, etc.)
-│   ├── spore_classes.yaml       #    → List of spore classes to detect
-│   └── disease_mapping.yaml     #    → Maps spore types to diseases
+│   ├── data_merged.yaml        #    → Multi-class dataset mapping (9 classes)
+│   ├── data.yaml               #    → Original single-class mapping
+│   ├── config.yaml             #    → Training hyperparameters
+│   ├── spore_classes.yaml      #    → Spore vocabulary
+│   └── disease_mapping.yaml    #    → Disease correlation matrix
 │
-├── data/                       # 📊 Your dataset (images + labels)
-│   ├── raw/                     #    → Original unprocessed images
-│   ├── processed/               #    → Preprocessed/augmented images
-│   ├── annotations/             #    → Label files
-│   └── splits/                  #    → Train/Val/Test split (YOLO reads from here)
-│       ├── train/
-│       │   ├── images/          #    → Training images (.jpg)
-│       │   └── labels/          #    → Training labels (.txt)
-│       ├── val/
-│       │   ├── images/          #    → Validation images
-│       │   └── labels/          #    → Validation labels
-│       └── test/
-│           ├── images/          #    → Test images
-│           └── labels/          #    → Test labels
+├── data/                       # 📊 Datasets (Raw, Processed, and Merged)
+│   ├── raw/                    #    → Original microscopic captures
+│   ├── splits/                 #    → Original dataset split
+│   ├── new_dataset/            #    → Supplemental negative examples
+│   └── merged/                 #    → The final 9-class composite training set
+│       ├── train/, val/, test/
 │
-├── scripts/                    # 🚀 Scripts to run
-│   ├── train.py                 #    → Train the YOLO model
-│   ├── detect.py                #    → Run detection on a single image
-│   └── predict_disease.py       #    → Full pipeline: detect → count → predict risk
+├── scripts/                    # 🚀 Execution Modules
+│   ├── train.py                #    → Triggers training pipeline
+│   ├── detect.py               #    → Standalone inference engine
+│   ├── merge_datasets.py       #    → Dataset curation & class remapping
+│   └── predict_disease.py      #    → Pipeline: Detection → Density Count → Risk
 │
-├── src/                        # 🧠 Core Python modules
-│   ├── data/                    #    → Dataset loading, preprocessing, augmentation
-│   ├── detection/               #    → SporeDetector (YOLO wrapper) & SporeCounter
-│   ├── prediction/              #    → Disease prediction & risk analysis logic
-│   └── utils/                   #    → Logger, visualization helpers
+├── src/                        # 🧠 Core Application Logic
+│   ├── data/                   #    → Dataloaders & augmentation
+│   ├── detection/              #    → YOLO wrapper & SporeCounter algorithm
+│   ├── prediction/             #    → Disease probability risk logic
+│   └── utils/                  #    → Logging & visualizers
 │
-├── runs/                       # 📈 Training results (auto-generated by YOLO)
+├── runs/                       # 📈 Auto-tracked Training Artifacts
 │   └── detect/runs/train/
-│       └── spore_detector2/
+│       └── spore_detector/     #    → ⭐ ALIGN TO THIS RUN!
 │           ├── weights/
-│           │   ├── best.pt      #    → ⭐ Best model weights (use this!)
-│           │   └── last.pt      #    → Last checkpoint
-│           ├── results.png      #    → Training metrics plot
-│           └── args.yaml        #    → Training arguments used
+│           │   └── best.pt     #    → Optimal 9-class weights
+│           ├── results.png     #    → F1/Precision/Recall curves
+│           └── args.yaml       #    → Immutable training record
 │
-├── outputs/                    # 📤 Prediction outputs
-│   └── predictions/             #    → Saved annotated images from detect.py
-│
-├── venv/                       # 🐍 Python virtual environment
-├── yolov8n.pt                  # Base YOLOv8 Nano pretrained weights
-├── yolo26n.pt                  # Base YOLO26 Nano pretrained weights
-├── requirements.txt            # 📦 Python dependencies
-└── README.md                   # 📖 This file
+├── outputs/                    # 📤 Processed visual artifacts & logs
+├── requirements.txt            # 📦 Dependencies
+└── README.md                   # 📖 Documentation
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
-### 1. Activate the virtual environment
+### 1. Environment Setup
 ```powershell
 .\venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-### 2. Train the model
+### 2. Run Inference on a Microscopic Slide
+Test the multi-class model on an image to see its distinguishing capabilities.
+
 ```powershell
-python scripts/train.py --data configs/data.yaml --epochs 100
+python scripts/detect.py --model "runs\detect\runs\train\spore_detector\weights\best.pt" --image "data\merged\test\images\YOUR_IMAGE.jpg" --show
 ```
+*Note: Due to the 9-class structure, the model will accurately label benign spores rather than throwing false positive Rice Blast alerts.*
 
-### 3. Test detection on an image
+### 3. Generate Disease Risk Report
+Pipe the detection results strictly into the risk assessment engine:
+
 ```powershell
-python scripts/detect.py --model "runs\detect\runs\train\spore_detector2\weights\best.pt" --image "data\splits\val\images\YOUR_IMAGE.jpg" --show
+python scripts/predict_disease.py --model "runs\detect\runs\train\spore_detector\weights\best.pt" --image "data\merged\test\images\YOUR_IMAGE.jpg" --save-report
 ```
 
-### 4. Full disease prediction pipeline
+### 4. Retrain the Network
+To increment epochs or adjust augmentation logic on the merged dataset:
+
 ```powershell
-python scripts/predict_disease.py --model "runs\detect\runs\train\spore_detector2\weights\best.pt" --image "data\splits\val\images\YOUR_IMAGE.jpg" --save-report
+python scripts/train.py --data configs/data_merged.yaml --epochs 50
 ```
-
----
-
-## 📝 Notes
-
-- **Current model**: YOLOv8 Nano (`yolov8n.pt`) — fast & lightweight
-- **Classes**: 1 class → `magnaporthe_oryzae` (Rice Blast spore)
-- **Dataset source**: Roboflow (Iowa State University)
-- **Image size**: 640x640 pixels
